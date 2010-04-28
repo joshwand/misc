@@ -11,13 +11,15 @@ require 'hpricot'
 # 
 # Author: Josh Wand <josh@joshwand.com>
 # Distribute freely with attribution
+STDOUT.sync = true
 
 
 terms = {}
 query = %q("died in a * accident")
+print "fetching terms: "
 
 %w(0 100 200 300 400 500).each do |num|
-  puts num + "..."
+  print num + "..."
 
   q = query.split(" ").map { |w| CGI.escape(w)}.join("+")
 
@@ -39,7 +41,7 @@ query = %q("died in a * accident")
 end
 
 # p terms
-puts "done fetching terms. \nCounting..."
+print "done. \nCounting..."
 
 
 results = {}
@@ -48,16 +50,21 @@ terms.keys.each do |term|
   q = CGI.escape(query.gsub("*",term))
   url = "http://www.google.com/search?q=#{q}&num=5"
   doc = Hpricot(open(url).read)
-  num = (doc/"[@id='resultStats']/b")[2].inner_html.gsub(",","").to_i
+  
+  num = (doc/"[@id='resultStats']/b")[2].inner_html.gsub(",","").to_i rescue 0
+  
   # p "#{term} #{num}"
-  puts "."
+  print "."
+
   results[term] = num
   # sleep 1 + rand(4) 
 end
-puts "done"
 
 
-results.sort{|a,b| a[1]<=>b[1]}.reverse.each do |elem|
+print "done\n\n\n"
+puts "=" * 60 
+
+results.sort{|a,b| a[1]<=>b[1]}.select {|term,item| term != "*"}.reverse.each do |elem|
   width = 30
 
   term = elem[0]
@@ -78,3 +85,5 @@ results.sort{|a,b| a[1]<=>b[1]}.reverse.each do |elem|
   puts text
   
 end
+
+puts "=" * 60 
