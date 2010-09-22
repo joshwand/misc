@@ -57,7 +57,7 @@ terms.keys.each do |term|
   print "."
 
   results[term] = num
-  # sleep 1 + rand(4) 
+  sleep 1 + rand(20) 
 end
 
 
